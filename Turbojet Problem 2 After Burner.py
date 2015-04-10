@@ -1,4 +1,4 @@
-#Turbojet Engine Problem 1
+#Turbojet Engine Problem 2
 
 import math
 import matplotlib.pyplot as plt
@@ -16,6 +16,7 @@ Cp2 = 1.24367
 M=1.8
 Fst=0.06
 hc=43124
+To6_max = 2000
 
 #Efficiencies
 nd=0.9
@@ -24,6 +25,8 @@ nb=0.98
 rb=0.97
 nt=0.92
 nn=0.98
+nab=0.95
+rab=0.97
  
 
 Mlist = []
@@ -97,35 +100,41 @@ for rc in np.arange(2,60,0.1):
     if rc == 2:
     	print 'Po5 '
     	print Po5
-    
+
+    #Afterburner
+    Po6A=rab*Po5
+    To6A = To6_max
+    Fab=((1+Fb)*(To6A-To5))/((nab*hc/Cp2)-To6A)
+    if Fab+Fb >= Fst:
+    	Fab = Fst-Fb
+    	To6A = (To5*(1+Fb))/(Fab+Fb+1)
+        
     #Nozzle
-    To6=To5
-    To7=To6
-    Po6=Po5
-    P7=Pa
-    T7as=(To6/((Po6/P7)**(gamma2-1/gamma2)))
+    To7A=To6A
+    P7A=Pa
+    T7As=(To6A/((Po6A/P7A)**(gamma2-1/gamma2)))
     if rc == 2:
-    	print 'T7as '
-    	print T7as
-    T7=To6-nn*(To6-T7as)
+    	print 'T7As '
+    	print T7As
+    T7A=To6A-nn*(To6A-T7As)
     if rc == 2:
-    	print 'T7 '
-    	print T7
-    M7=math.sqrt(((To7/T7)-1)*(2/(gamma2-1)))
+    	print 'T7A '
+    	print T7A
+    M7A=math.sqrt(((To7A/T7A)-1)*(2/(gamma2-1)))
     if rc == 2:
-    	print 'M7 '
-    	print M7
-    u7 = M7*math.sqrt(gamma2*R*T7)
+    	print 'M7A '
+    	print M7A
+    u7A = M7A*math.sqrt(gamma2*R*T7A)
     if rc == 2:
-        print 'u7 '
-        print u7
+        print 'u7A '
+        print u7A
 		
-    I = (1+Fb)*u7-u_in
+    I = (1+Fb+Fab)*u7A-u_in
     TSFC = Fb/I
-    nth=(((1+Fb)*u7**2-u_in**2)/(2*Fb*hc*1000))
-    np=(2*u_in/(u7+u_in))
+    nth=(((1+Fb+Fab)*u7A**2-u_in**2)/(2*(Fab+Fb)*hc*1000))
+    np=(2*u_in/(u7A+u_in))
     no=nth*np
-    A_ratio = (1/M7)*((2/2.3)*(1+(0.3/2)*M7**2))**(2.3/0.6)
+    A_ratio = (1/M7A)*((2/2.3)*(1+(0.3/2)*M7A**2))**(2.3/0.6)
 	
     Ilist.append([I])
     TSFClist.append([TSFC])
@@ -141,36 +150,36 @@ plt.figure(1)
 plt.plot(rclist, Ilist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('Specific Thrust, I')
-plt.title('I vs r_c')
+plt.title('After Burner I vs r_c')
 
 plt.figure(2)
 plt.plot(rclist, TSFClist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('TSFC')
-plt.title('TSFC vs r_c')
+plt.title('After Burner TSFC vs r_c')
 
 plt.figure(3)
 plt.plot(rclist, nthlist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('Thermal Efficiency, nth')
-plt.title('Thermal Efficiency vs r_c')
+plt.title('After Burner Thermal Efficiency vs r_c')
 
 plt.figure(4)
 plt.plot(rclist, nplist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('Propulsive Efficiency, np')
-plt.title('Propulsive Efficiency vs r_c')
+plt.title('After Burner Propulsive Efficiency vs r_c')
 
 plt.figure(5)
 plt.plot(rclist, nolist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('Overall Efficiency, no')
-plt.title('Overall Efficiency vs r_c')
+plt.title('After Burner Overall Efficiency vs r_c')
 
 plt.figure(6)
 plt.plot(rclist, A_ratiolist)
 plt.xlabel('Compressor Pressure Ratio, r_c')
 plt.ylabel('Area Ratio, A/A*')
-plt.title('Area Ratio vs r_c')
+plt.title('After Burner Area Ratio vs r_c')
 
 plt.show()
